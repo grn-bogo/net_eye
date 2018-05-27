@@ -3,7 +3,7 @@ import numpy
 
 from scapy.all import *
 
-FIGSIZE = (10.0, 16.0)
+FIG_SIZE = (6.0, 16.0)
 
 
 def autolabel(rects):
@@ -15,7 +15,7 @@ def autolabel(rects):
 
 class TCPTrafficSequence:
 
-    def __init__(self, srv_port=81, srv_ip="193.138.218.38", file_name="test.pcapng"):
+    def __init__(self, srv_port=8888, srv_ip="127.0.0.1", file_name="test2.pcapng"):
         self._srv_port = srv_port
         self._srv_ip = srv_ip
         self._file_name = file_name
@@ -58,7 +58,7 @@ class TCPTrafficSequence:
         msg_tags = ["control", "data"]
         colors = ["red", "blue"]
         msg_counts = [self.ctrl_pkts, self.data_pkts]
-        plt.figure(num=1, figsize=FIGSIZE)
+        plt.figure(num=1, figsize=FIG_SIZE)
         h = plt.bar(numpy.arange(len(msg_tags)), msg_counts, label=msg_tags, color=colors)
         xticks_pos = [0.65 * patch.get_width() + patch.get_xy()[0] for patch in h]
         plt.xticks(xticks_pos, msg_tags, ha='right', rotation=80)
@@ -72,7 +72,7 @@ class TCPTrafficSequence:
         msg_tags = ["overhead data bytes", "payload data bytes"]
         colors = ["red", "blue"]
         msg_counts = [self.overhead_size, self.payload_size]
-        plt.figure(num=1, figsize=FIGSIZE)
+        plt.figure(num=1, figsize=FIG_SIZE)
         h = plt.bar(numpy.arange(len(msg_tags)), msg_counts, label=msg_tags, color=colors)
         xticks_pos = [0.65 * patch.get_width() + patch.get_xy()[0] for patch in h]
         plt.xticks(xticks_pos, msg_tags, ha='right', rotation=80)
@@ -92,10 +92,31 @@ class HTTPTrafficSequence(TCPTrafficSequence):
         if pkt.haslayer(HTTP):
             self._sequence += pkt[HTTP].payload
 
+if __name__ == '__main__':
+    import argparse
 
-if __name__ == "__main__":
-    sequence = TCPTrafficSequence()
+    input_parser = argparse.ArgumentParser()
+    input_parser.add_argument('-pcap',
+                              help='Absolute path of pcap or pcapng file to be processed',
+                              action='store',
+                              type=str,
+                              default='test2.pcap',
+                              dest="pcap_path")
+    input_parser.add_argument('-ip',
+                              help='IP address of the processed traffic s serving entity',
+                              action='store',
+                              type=str,
+                              dest="srv_ip")
+    input_parser.add_argument('-port',
+                              help='TCP port of the processed traffic s serving entity',
+                              action='store',
+                              type=int,
+                              dest="tcp_port")
+    args = input_parser.parse_args()
+
+    sequence = TCPTrafficSequence(srv_port=args.tcp_port, srv_ip=args.srv_ip, file_name=args.pcap_path)
     sequence.init()
     print("PAYLOAD: {0}, OVERHEAD {1}".format(sequence.payload_size, sequence.overhead_size))
     print("PAYLOAD TO OVERHEAD {0}".format(sequence.payload_ratio))
     sequence.create_statistics_files()
+
