@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy
+import os
 
 from scapy.all import *
 
@@ -15,11 +16,12 @@ def autolabel(rects):
 
 class TCPTrafficSequence:
 
-    def __init__(self, srv_port=8888, srv_ip="127.0.0.1", file_name="test2.pcapng"):
+    def __init__(self, srv_port=8888, srv_ip="127.0.0.1", file_name="tst.pcapng"):
         self._srv_port = srv_port
         self._srv_ip = srv_ip
         self._file_name = file_name
         self._sequence = []
+        self._stats_dir = '{0}_stats'.format(self._file_name.split(".")[0])
 
         self.payload_size = 0
         self.overhead_size = 0
@@ -64,8 +66,8 @@ class TCPTrafficSequence:
         plt.xticks(xticks_pos, msg_tags, ha='right', rotation=80)
         autolabel(h)
         plt.tight_layout()
-        plt.title("Message with data to control messages ")
-        plt.savefig("msg_count_ctrl_to_data.png")
+        plt.title("Number of TCP data messages and control messages")
+        plt.savefig(os.path.join(self._stats_dir, "msg_count_ctrl_to_data.png"))
         plt.close()
 
     def payload_to_overhead(self):
@@ -78,11 +80,16 @@ class TCPTrafficSequence:
         plt.xticks(xticks_pos, msg_tags, ha='right', rotation=80)
         autolabel(h)
         plt.tight_layout()
-        plt.title("Overhead to Payload")
-        plt.savefig("overhead_to_payload.png")
+        plt.title("TCP Overhead to Payload")
+        plt.savefig(os.path.join(self._stats_dir, "overhead_to_payload.png"))
         plt.close()
 
+    def make_stats_dir(self):
+        os.makedirs(self._stats_dir, exist_ok=True)
+
     def create_statistics_files(self):
+        self.make_stats_dir()
+
         self.ctrl_msgs_to_data_msgs()
         self.payload_to_overhead()
 
