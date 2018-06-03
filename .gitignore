@@ -109,3 +109,10 @@ venv.bak/
 # ignore pcaps
 .pcap
 .pcapng
+
+# virtualenv
+bin/
+lib64
+pyvenv.cfg
+pip-selfcheck.json
+share/
