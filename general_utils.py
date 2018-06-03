@@ -4,35 +4,28 @@ import os
 import shutil
 import subprocess
 
-PROTOC_PY_CMD = 'protoc {proto_sources} -I{proto_dir} --python_out={out_dir} *.proto'
+PROTOC_ALL_CMD = 'protoc -I. --cpp_out={proto_cpp} --python_out={proto_py} {proto_file}'
 
 
-def generate_proto(root_path, output_path=None):
-    proto_dirs = set()
-    proto_files = proto_files_in_build(root_path)
-    for file_path in proto_files:
-        f_dir, f_name = _file_dir_and_name(file_path)
-        proto_dirs.add(f_dir)
+def generate_proto(proto_root):
+    proto_files = proto_files_in_build(proto_root)
 
-    if not output_path:
-        output_path = os.path.join(root_path, 'generated_proto_py')
+    output_path_py = os.path.join('..', 'generated_proto_py')
+    output_path_cpp = os.path.join('..', 'generated_proto_cpp')
+    os.makedirs(output_path_cpp, exist_ok=True)
+    os.makedirs(output_path_py, exist_ok=True)
 
-    os.makedirs(output_path, exist_ok=True)
+    cmd_template = PROTOC_ALL_CMD
+    os.chdir(proto_root)
 
-    sources_in_cmd = ' -I' + '{sep} -I'.format(sep=os.sep).join(proto_dirs) + os.sep
-
-    for proto_dir in sorted(proto_dirs):
-        os.chdir(proto_dir)
-        tree_location = os.path.relpath(proto_dir, os.path.join(root_path, 'Celer'))
-        out_dir = os.path.join(output_path, tree_location)
-        os.makedirs(out_dir, exist_ok=True)
-        cmd = PROTOC_PY_CMD.format(proto_sources=sources_in_cmd,
-                                   proto_dir=proto_dir,
-                                   out_dir=os.path.join(output_path, tree_location))
-        print(proto_dir)
+    for proto_file in proto_files:
+        rel_file_path = os.path.relpath(proto_file, proto_root)
+        cmd = cmd_template.format(proto_cpp=output_path_cpp,
+                                  proto_py=output_path_py,
+                                  proto_file=rel_file_path)
         print(cmd)
         try:
-            subprocess.check_output(cmd, shell=True)
+            subprocess.check_output(str(cmd), shell=True)
         except subprocess.CalledProcessError as e:
             pass
 
@@ -79,8 +72,3 @@ def git_root():
 
     dir_parts = top_level.replace('\n', '').split('/')
     return os.path.join(dir_parts[0] + os.sep, *dir_parts[1:]), top_level.replace('\n', '')
-
-
-if __name__ == "__main__":
-    ver, rever = git_root()
-    generate_proto(root_path=ver)
