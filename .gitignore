@@ -110,6 +110,9 @@ venv.bak/
 .pcap
 .pcapng
 
+# swap files from editors
+*.swp
+
 # virtualenv
 bin/
 lib64
