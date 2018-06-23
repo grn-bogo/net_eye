@@ -1,7 +1,11 @@
 #! /usr/bin/env python3
+from utils.net_logger import create_logger
 
 
 def main(argv):
+    '''
+
+    '''
     from argparse import ArgumentParser
     from pcap_parser.tcp_parsing import TCPTrafficSequence
     parser = ArgumentParser()
@@ -26,16 +30,33 @@ def main(argv):
             dest="tcp_port")
     args = parser.parse_args()
 
-    sequence = TCPTrafficSequence(srv_port=args.tcp_port,
-                                  srv_ip=args.srv_ip,
-                                  file_name=args.pcap_path)
+    logger.info("  @@@@@@@@@@@@@@@@@@@@@@@@@")
+    logger.info("  -------------------------")
+    logger.info("||    N E T   --  E Y E    ||")
+    logger.info("  -------------------------")
+    logger.info("  @@@@@@@@@@@@@@@@@@@@@@@@@")
+
+    logger.debug("Arguments: -----")
+    for arg in vars(args):
+        logger.debug("arg[{k}] = {v}".format(k=arg, v=getattr(args, arg)))
+    logger.debug("----------------")
+
+    sequence = TCPTrafficSequence(
+                    srv_port=args.tcp_port,
+                    srv_ip=args.srv_ip,
+                    file_name=args.pcap_path)
     sequence.init()
-    print("PAYLOAD: {0}, OVERHEAD {1}".format(
-        sequence.payload_size, sequence.overhead_size))
-    print("PAYLOAD TO OVERHEAD {0}".format(sequence.payload_ratio))
+
+    logger.info(
+        "PAYLOAD: {0}, OVERHEAD {1}".format(
+            sequence.payload_size, sequence.overhead_size))
+    logger.info(
+        "PAYLOAD TO OVERHEAD {0}".format(sequence.payload_ratio))
+
     sequence.create_statistics_files()
 
 
 if __name__ == '__main__':
     import sys
+    logger = create_logger('net_eye')
     main(sys.argv)
