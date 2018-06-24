@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-from utils.net_logger import create_logger
+from utils.net_eye_logger import get_logger
 
 
 def main(argv):
@@ -58,5 +58,5 @@ def main(argv):
 
 if __name__ == '__main__':
     import sys
-    logger = create_logger('net_eye')
+    logger = get_logger('net_eye')
     main(sys.argv)

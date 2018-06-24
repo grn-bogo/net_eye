@@ -1,7 +1,7 @@
 import logging
 
 
-def create_logger(name):
+def get_logger(name):
     '''
 
     '''
