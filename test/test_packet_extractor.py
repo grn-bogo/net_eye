@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import unittest
-from dispatcher.packet_file_dispatcher import PacketFileDispatcher
+from dispatch.pkt_file_dispatch import PacketFileDispatcher
 
 
 class TestPacketFileDispatcher(unittest.TestCase):
