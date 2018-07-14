@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from .packet_dispatcher import PacketDispatcher
+from .pkt_dispatch import PacketDispatcher
 from collections import deque
 from scapy.all import sniff
 from threading import Thread
