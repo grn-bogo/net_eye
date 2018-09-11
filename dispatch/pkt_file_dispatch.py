@@ -1,6 +1,6 @@
 #! /usr/bin/env
 
-from .packet_dispatcher import PacketDispatcher
+from .pkt_dispatch import PacketDispatcher
 from scapy.all import rdpcap
 
 
